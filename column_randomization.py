@@ -13,13 +13,13 @@ import os
 
 pd.options.mode.chained_assignment = None 
 
-def randomize(file, index_col = None):
+def randomize(filepath, index_col = None):
     '''
-    Randomize column values of file. Each column is randomized independently.
+    Randomize column values of a file. Each column is randomized independently.
     
     Inputs:
-        file (str): file name of type csv or txt
-        index_col (str): name of column to use as index; will not be randomized
+        filepath (str): path to file to randomize; may be of type csv or txt
+        index_col (str): optional name of column to use as index; will not be randomized
     
     Outputs:
         df (dataframe): dataframe representation of randomized data
@@ -27,25 +27,24 @@ def randomize(file, index_col = None):
     '''
     
     # Treat csv and txt differently
-    filename, file_extension = os.path.splitext(file)
+    filename, file_extension = os.path.splitext(filepath)
     if file_extension == '.csv':
         sep = ","
     elif file_extension == '.txt':
         sep = "\t"
         
     # Randomize each column
-    df = pd.read_csv(file, sep = sep, index_col = index_col) 
+    df = pd.read_csv(filepath, sep = sep, index_col = index_col) 
     cols = df.columns
     for col in cols:
-        print('Randomizing column ' + col)
-        np.random.shuffle(df[col])
+        print('... Randomizing column ' + col)
+        df[col] = np.random.permutation(df[col])
         
     # Print to new csv or txt
     new_file = filename + '_randomized' + file_extension
     df.to_csv(new_file)   
     
     return df
-
 
 if __name__ == "__main__":
 
