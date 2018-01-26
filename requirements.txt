@@ -1,0 +1,4 @@
+pandas == 0.20.1
+nupy == 1.13.1
+sklearn == 0.19.1
+matplotlib == 2.0.2
