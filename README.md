@@ -5,7 +5,7 @@ Type of leakage that may be detected with this method: Leaky validation strategi
 - Leakage of test data into training data during preprocessing / cleaning
 - Pre-selecting features based on entire dataset
 - Including the correct label in the feature set
-- Incorrect handling of temporal data, leaking information from the future into the past
+- Incorrect handling of temporal data, leaking information from the future into the past -- only when time/period info is available as indicator column(s)
 
 Type of leakage that would not be detected: Leaky predictors, i.e.predictors contain information that should not be available at decision time. For example: 
 - Leakage from columns that serve as proxies for the outcome
