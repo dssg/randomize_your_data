@@ -99,3 +99,7 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# credentials
+dd_credentials.py
+credentials.py
