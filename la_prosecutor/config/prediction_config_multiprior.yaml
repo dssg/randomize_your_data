@@ -1,0 +1,130 @@
+# CONFIG_VERSION
+config_version: 'v1'
+
+# TIME SPLITTING
+# The time window to look at, and how to divide the window into
+# train/test splits
+temporal_config:
+    beginning_of_time: '1995-01-01' # earliest date included in features
+    modeling_start_time: '2017-01-01' # earliest date in any model
+    modeling_end_time: '2018-01-01' # all dates in any model are < this date
+    update_window: '6month' # how frequently to retrain models
+    train_label_windows: ['6month']
+    test_label_windows: ['6month'] # how much time covered by labels
+    train_durations: ['0d'] # length of time included in a model
+    test_durations: ['0d'] # length of period to sample from in test set
+    train_example_frequency: '1d'
+    test_example_frequency: '1d' # how frequently to sample in the test set
+
+# USER METADATA
+user_metadata:
+    label_definition: 'any_case_booking'
+    univ_definition: 'multi_prior'
+
+# LABEL GENERATION
+# Information needed to generate labels
+#
+# An events table is expected, with the columns:
+#   entity_id - an identifier for which the labels are applied to
+#   outcome_date - The date at which some outcome was known
+#   outcome - A boolean outcome
+# These are used to generate appropriate labels for each train/test split
+events_table: 'staging.labels_multiprior_win6mo_lab6mo'
+
+# STATE MANAGEMENT
+state_config:
+    table_name: 'staging.states_win6mo_lab6mo'
+    state_filters:
+        - 'multi_prior'
+
+# FEATURE GROUPING
+# define how to group features and generate combinations
+# feature_group_definition allows you to create groups/subset of your features
+# by different criteria.
+# for instance, 'tables' allows you to send a list of collate feature tables
+# 'prefix' allows you to specify a list of feature name prefixes
+feature_group_definition:
+    tables:
+        - 'demos_aggregation'
+        - 'charge_info_aggregation'
+        - 'case_info_aggregation'
+        - 'case_flags_aggregation'
+        - 'case_results_aggregation'
+        - 'pending_cases_aggregation'
+        - 'booking_info_aggregation'
+        - 'days_since_aggregation'
+        - 'days_between_aggregation'
+        - 'freq_chgs_aggregation'
+        - 'num_prior_aggregation'
+
+# strategies for generating combinations of groups
+# available: all, leave-one-out, leave-one-in
+feature_group_strategies: ['all']
+
+model_group_keys:
+    - 'train_duration'
+    - 'label_window'
+    - 'example_frequency'
+    - 'label_definition'
+    - 'univ_definition'
+
+# GRID CONFIGURATION
+# The classifier/hyperparameter combinations that should be trained
+#
+# Each top-level key should be a class name, importable from triage. sklearn is
+# available, and if you have another classifier package you would like available,
+# contribute it to requirements.txt
+#
+# Each lower-level key is a hyperparameter name for the given classifier, and
+# each value is a list of potential values. All possible combinations of
+# classifiers and hyperparameters are trained.
+grid_config:
+    # 'sklearn.tree.DecisionTreeClassifier':
+    #     criterion: [gini]
+    #     max_depth: [3,5,50]
+    #     min_samples_split: [10,100]
+    'catwalk.estimators.classifiers.ScaledLogisticRegression':
+        penalty: ['l1']
+        C: [1]
+    # 'sklearn.ensemble.RandomForestClassifier':
+    #     max_features: ['sqrt']
+    #     criterion: ['gini']
+    #     n_estimators: [1000, 5000]
+    #     min_samples_split: [20, 100]
+    #     max_depth: [10, 50]
+    #     n_jobs: [32]
+    # 'sklearn.ensemble.ExtraTreesClassifier':
+    #     max_features: ['sqrt']
+    #     criterion: ['gini']
+    #     n_estimators: [1000, 5000]
+    #     min_samples_split: [20, 100]
+    #     max_depth: [10, 50]
+    #     n_jobs: [32]
+    # 'sklearn.linear_model.LogisticRegression':
+    #     penalty: ['l1', 'l2']
+    #     C: [0.01, 1]
+#    'xgboost.sklearn.XGBClassifier':
+#        n_estimators: [1000, 5000, 10000]
+#        learning_rate: [0.02, 0.05, 0.1, .2]
+#        max_depth: [5, 10, 20, 50, 100]
+
+# MODEL SCORING
+# How metrics for each model are made and stored
+#
+# Each entry needs a list of one of the metrics defined in
+# triage.scoring.ModelScorer.available_metrics (contributions welcome!)
+# Depending on the metric, either thresholds or parameters
+#
+# Parameters specify any hyperparameters needed. For most metrics,
+# which are simply wrappers of sklearn functions, these
+# are passed directly to sklearn.
+#
+# Thresholds are more specific: The list is subset and only the
+# top percentile or top n entities are labeled as positive.
+scoring:
+    metric_groups:
+        -
+            metrics: ['precision@', 'recall@', 'fpr@']
+            thresholds:
+                percentiles: [1.0, 2.0, 5.0, 10.0, 25.0]
+                top_n: [25, 75, 150, 300, 500, 1000, 1500]

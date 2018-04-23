@@ -1,0 +1,51 @@
+- # features for prior case results
+  prefix: 'case_results'
+  from_obj: 'staging.feature_case_results LEFT JOIN staging.case_result_lkup USING(case_result)'
+  knowledge_date_column: 'result_date'
+  aggregates:
+    - # dollar amount fined
+      quantity: 'fine'
+      metrics: ['max', 'sum', 'avg']
+    - # days of jail time sentenced
+      quantity: 'jail'
+      metrics: ['max', 'sum', 'avg']
+    - # days(?) of jail/probabtion sentenced
+      quantity: 'jail_prob'
+      metrics: ['max', 'sum', 'avg']
+    - # months of probation sentenced
+      quantity: 'prob'
+      metrics: ['max', 'sum', 'avg']
+    - # 
+      quantity: 'restitu'
+      metrics: ['max', 'sum', 'avg']
+    - # 
+      quantity: 'invcost'
+      metrics: ['max', 'sum', 'avg']
+  categoricals:
+    - # case outcome
+      column: 'result_id'
+      choice_query: 'SELECT DISTINCT result_id FROM staging.feature_case_results LEFT JOIN staging.case_result_lkup USING(case_result)'
+      metrics: ['max', 'sum']
+  intervals: ['1y', '2y', '5y', '10y', '50y']
+  groups: ['entity_id']
+- # features for currently pending cases
+  prefix: 'pending_cases'
+  from_obj: |
+    (
+      SELECT c.*, cr.result_date
+      FROM staging.feature_case_info c 
+      LEFT JOIN staging.feature_case_results cr
+        ON c.casenumber = cr.casenumber
+    ) AS pending
+  knowledge_date_column: 'case_date'
+  aggregates:
+    - # total number pending
+      quantity:
+        open_cases: CASE WHEN result_date IS NULL OR result_date > '{collate_date}'::DATE THEN 1 ELSE 0 END
+      metrics: ['sum', 'max']
+    - # time pending
+      quantity:
+        time_open: CASE WHEN result_date IS NULL OR result_date > '{collate_date}'::DATE THEN '{collate_date}'::DATE - case_date::DATE ELSE NULL END
+      metrics: ['max', 'avg']
+  intervals: ['1y', '2y', '5y', '10y', '50y']
+  groups: ['entity_id']
