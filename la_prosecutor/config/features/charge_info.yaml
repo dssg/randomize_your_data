@@ -1,0 +1,43 @@
+- # features from case charges
+  prefix: 'charge_info'
+  from_obj: 'staging.feature_charge_info LEFT JOIN staging.charge_lkup USING(category)'
+  knowledge_date_column: 'case_date'
+  aggregates:
+    - # more serious misdemeanor charges
+      quantity: 'more_serious_flag'
+      metrics: ['max', 'sum', 'avg']
+    - # less serious misdemeanor charges
+      quantity: 'low_level_flag'
+      metrics: ['max', 'sum', 'avg']
+    - # charges from LA municipal code
+      quantity: 'municipal_code_flag'
+      metrics: ['max', 'sum']
+    - # attempts
+      quantity: 'attempt_flag'
+      metrics: ['max', 'sum']
+    - # gang-related charges
+      quantity: 'gang_related_flag'
+      metrics: ['max', 'sum', 'avg']
+    # - # alchohol-related charges
+    #   quantity: 'alcohol_related_flag'
+    #   metrics: ['max', 'sum', 'avg']
+    # - # drug use charges
+    #   quantity: 'drug_use_flag'
+    #   metrics: ['max', 'sum', 'avg']
+    # - # protective order violations
+    #   quantity: 'protective_order_flag'
+    #   metrics: ['max', 'sum', 'avg']
+    # - # probation violations
+    #   quantity: probation_violation_flag
+    #   metrics: ['max', 'sum', 'avg']
+  categoricals:
+    - # type of charge
+      column: 'chrg_cat_id'
+      choice_query: 'SELECT DISTINCT chrg_cat_id FROM staging.feature_charge_info LEFT JOIN staging.charge_lkup USING(category)'
+      metrics: ['max', 'sum']
+    - # top-level section
+      column: 'section_prefix'
+      choice_query: 'SELECT DISTINCT section_prefix FROM staging.feature_charge_info'
+      metrics: ['max', 'sum']
+  intervals: ['1y', '2y', '5y', '10y', '50y']
+  groups: ['entity_id']

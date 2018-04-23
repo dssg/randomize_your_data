@@ -1,0 +1,72 @@
+- # days between prior cases/bookings (NOTE - multi-prior only)
+  prefix: 'days_between'
+  from_obj: |
+    (
+      SELECT *, 
+        event_date - LAG(event_date) OVER (PARTITION BY entity_id ORDER BY event_date) AS days_between
+      FROM staging_randomized.entity_all_events
+    ) AS events
+  knowledge_date_column: 'event_date'
+  aggregates:
+    - # days between cases/bookings
+      quantity: 'days_between'
+      metrics: ['avg', 'stddev']
+  intervals: ['5y', '50y']
+  groups: ['entity_id']
+- # charge type consistency (NOTE - multi-prior only AND uses labels table in from_obj!!!)
+  prefix: 'freq_chgs'
+  from_obj: |
+    (
+      WITH chgs_pre AS (
+        SELECT labs.entity_id, labs.outcome_date - INTERVAL '1 day' AS knowledge_date, cc.category,
+               COUNT(*)/SUM(COUNT(*)) OVER (PARTITION BY labs.entity_id, labs.outcome_date - INTERVAL '1 day') AS pct_of_charges
+        FROM staging_randomized.labels_casesonly_multiprior_win6mo_lab6mo_randomized labs
+        LEFT JOIN staging_randomized.feature_charge_info_randomized cc 
+          ON labs.entity_id = cc.entity_id
+          AND cc.case_date < labs.outcome_date
+        GROUP BY 1,2,3
+      ),
+      cats_rn AS (
+        SELECT *, row_number() OVER (PARTITION BY entity_id, knowledge_date ORDER BY pct_of_charges DESC, RANDOM()) AS rn_freq
+        FROM chgs_pre
+      )
+      SELECT entity_id, knowledge_date, chrg_cat_id AS max_cat_id, pct_of_charges AS max_pct_chgs
+      FROM cats_rn
+      LEFT JOIN staging_randomized.charge_lkup_randomized USING(category)
+      WHERE rn_freq = 1
+    ) AS top_cats
+  knowledge_date_column: 'knowledge_date'
+  aggregates:
+    - # percent of charges in most frequent category
+      quantity: 'max_pct_chgs'
+      metrics: ['max']
+  categoricals:
+    - # most frequent charge category
+      column: 'max_cat_id'
+      choice_query: 'SELECT DISTINCT chrg_cat_id FROM staging_randomized.feature_charge_info_randomized LEFT JOIN staging_randomized.charge_lkup_randomized USING(category)'
+      metrics: ['max']
+  intervals: ['7d']
+  groups: ['entity_id']
+- # number of prior case and booking events
+  prefix: 'num_prior'
+  from_obj: "(SELECT * FROM staging_randomized.entity_all_events) AS events"
+  knowledge_date_column: 'event_date'
+  aggregates:
+    - # number of prior cases
+      quantity:
+        cases: CASE WHEN event_type='case' THEN 1 ELSE 0 END
+      metrics: ['sum']
+    - # number of prior bookings
+      quantity: 
+        bookings: CASE WHEN event_type='booking' THEN 1 ELSE 0 END
+      metrics: ['sum']
+    - # number of prior events of either type
+      quantity:
+        any: '1'
+      metrics: ['sum']
+    - # prior events valid for labels
+      quantity:
+        nonexcl: 1 - exclude_flag
+      metrics: ['sum', 'avg']
+  intervals: ['1y', '2y', '5y', '10y', '50y']
+  groups: ['entity_id']

@@ -1,0 +1,11 @@
+- # days since last case/booking event
+  prefix: 'days_since'
+  from_obj: "(SELECT * FROM staging_randomized.entity_all_events) AS events"
+  knowledge_date_column: 'event_date'
+  aggregates:
+    - # days since last event
+      quantity:
+        last_event: "'{collate_date}'::DATE - event_date"
+      metrics: ['min']
+  intervals: ['50y']
+  groups: ['entity_id']

@@ -1,0 +1,53 @@
+- # features from entity demographics
+    prefix: 'demos'
+    from_obj: 'staging.entity_best_demos'
+    knowledge_date_column: 'min_case_date'
+    aggregates:
+      - # age in years 
+        quantity:
+          age: "EXTRACT(YEAR FROM AGE('{collate_date}'::DATE, dob::DATE))"
+        metrics: ['max']
+      - # age at first case
+        quantity: 'age_first_case'
+        metrics: ['max']
+      - # imputed age flag
+        quantity: 'dob_imputed'
+        metrics: ['max']
+      - # gender
+        quantity: 'gender_male'
+        metrics: ['max']
+      - # flag if gender was imputed from name
+        quantity: 'gender_imputed_name'
+        metrics: ['max']
+      - # flag if gender was imputed at pop. level
+        quantity: 'gender_imputed_pop'
+        metrics: ['max']
+      - # race flag - H
+        quantity: 'race_H'
+        metrics: ['max']
+      - # race flag - B
+        quantity: 'race_B'
+        metrics: ['max']
+      - # race flag - W
+        quantity: 'race_W'
+        metrics: ['max']
+      - # race flag - O
+        quantity: 'race_O'
+        metrics: ['max']
+      - # race flag - C
+        quantity: 'race_C'
+        metrics: ['max']
+      - # race flag - A
+        quantity: 'race_A'
+        metrics: ['max']
+      - # race flag - other
+        quantity: 'race_other'
+        metrics: ['max']
+      - # flag if race/ethnicity was imputed from name
+        quantity: 'race_imputed_name'
+        metrics: ['max']
+      - # flag if race/ethnicity was imputed at pop. level
+        quantity: 'race_imputed_pop'
+        metrics: ['max']
+    intervals: ['50y']
+    groups: ['entity_id']
