@@ -1,0 +1,11 @@
+- # features from case flags
+  prefix: 'case_flags'
+  from_obj: 'staging_randomized.feature_casesflag_info_randomized LEFT JOIN staging_randomized.case_flag_lkup_randomized USING(flag)'
+  knowledge_date_column: 'flag_knowledge_date'
+  categoricals:
+    - # case flags
+      column: 'flag_id'
+      choice_query: 'SELECT DISTINCT flag_id FROM staging_randomized.feature_casesflag_info_randomized LEFT JOIN staging_randomized.case_flag_lkup_randomized USING(flag)'
+      metrics: ['max', 'sum']
+  intervals: ['1y', '2y', '5y', '10y', '25y']
+  groups: ['entity_id']

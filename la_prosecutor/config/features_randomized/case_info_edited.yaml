@@ -1,0 +1,42 @@
+- # features for case-level info
+  prefix: 'case_info'
+  from_obj: |
+    (
+      SELECT *
+      FROM staging_randomized.feature_case_info_randomized
+      LEFT JOIN staging_randomized.case_dispo_lkup_randomized USING(case_dispo)
+      LEFT JOIN staging_randomized.orig_agency_lkup_randomized USING(orig_agency)
+      LEFT JOIN staging_randomized.branch_lkup_randomized USING(branch)
+    ) AS fci
+  knowledge_date_column: 'case_date'
+  aggregates:
+    - # number of AKAs to date
+      quantity: 'num_akas_to_date'
+      metrics: ['max']
+    - # Any priors in case additional info
+      quantity: 'any_prior_addinfo'
+      metrics: ['max']
+    - # Any hospitalization in case additional info
+      quantity: 'any_hosp_addinfo'
+      metrics: ['max']
+    - # number of charges by case
+      quantity: 'num_charges'
+      metrics: ['max', 'sum', 'avg']
+    - # cases with transient addresses
+      quantity: 'transient_address_flag'
+      metrics: ['max', 'sum', 'avg']
+  categoricals:
+    - # case disposition (e.g. filing decision)
+      column: 'dispo_id'
+      choice_query: 'SELECT DISTINCT dispo_id FROM staging_randomized.feature_case_info_randomized LEFT JOIN staging_randomized.case_dispo_lkup_randomized USING(case_dispo)'
+      metrics: ['max', 'sum']
+    - # originating agency
+      column: 'agency_id'
+      choice_query: 'SELECT DISTINCT agency_id FROM staging_randomized.feature_case_info_randomized LEFT JOIN staging_randomized.orig_agency_lkup_randomized USING(orig_agency)'
+      metrics: ['max', 'sum']
+    - # case branch
+      column: 'branch_id'
+      choice_query: 'SELECT DISTINCT branch_id FROM staging_randomized.feature_case_info_randomized LEFT JOIN staging_randomized.branch_lkup_randomized USING(branch)'
+      metrics: ['max', 'sum']
+  intervals: ['1y', '2y', '5y', '10y', '50y']
+  groups: ['entity_id']
