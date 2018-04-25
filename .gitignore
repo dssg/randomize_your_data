@@ -103,3 +103,4 @@ ENV/
 # credentials
 dd_credentials.py
 credentials.py
+database.yaml
