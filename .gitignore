@@ -101,4 +101,6 @@ ENV/
 .mypy_cache/
 
 # credentials
-*credentials.py
+dd_credentials.py
+credentials.py
+database.yaml
