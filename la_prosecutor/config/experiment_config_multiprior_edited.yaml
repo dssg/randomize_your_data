@@ -30,7 +30,7 @@ user_metadata:
 #   outcome_date - The date at which some outcome was known
 #   outcome - A boolean outcome
 # These are used to generate appropriate labels for each train/test split
-events_table: 'staging_randomized.labels_multiprior_win6mo_lab6mo'
+events_table: 'staging_randomized.labels_multiprior_win6mo_lab6mo_randomized'
 
 # STATE MANAGEMENT
 state_config:
