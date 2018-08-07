@@ -11,10 +11,14 @@ Type of leakage that would not be detected: Leaky predictors, i.e.predictors con
 - Leakage from columns that serve as proxies for the outcome
 - Using external data sources not available to model's natural environment 
 
-
 Data leakages references:  
 - https://www.kaggle.com/wiki/Leakage
 - https://www.kaggle.com/dansbecker/data-leakage  
 - https://www.coursera.org/learn/python-machine-learning/lecture/ois3n/data-leakage
 - https://medium.com/@colin.fraser/the-treachery-of-leakage-56a2d7c4e931
 - http://dstillery.com/wp-content/uploads/2014/05/Leakage-in-Data-Mining-Formulation-Detection-and-Avoidance.pdf
+
+Repo contents:
+- randomization_strategy: Exploration of the randomization strategy for leakage detection using dummy data and models.
+- dirty_duck: Application of randomization strategy towards the Dirty Duck Inspections Tutorial, using City of Chicago inspections prioritization data.
+- la_prosecutor: A series of tests for leakage, demonstrated on the Los Angeles Chronic Offenders Leakage project.
