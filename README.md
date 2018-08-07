@@ -20,5 +20,5 @@ Data leakages references:
 
 Repo contents:
 - randomization_strategy: Exploration of the randomization strategy for leakage detection using dummy data and models.
-- dirty_duck: Application of randomization strategy towards the Dirty Duck Inspections Tutorial, using City of Chicago inspections prioritization data.
-- la_prosecutor: A series of tests for leakage, demonstrated on the Los Angeles Chronic Offenders Leakage project.
+- dirty_duck: Application of randomization strategy towards the Dirty Duck Tutorials[https://github.com/dssg/dirtyduck], using City of Chicago inspections prioritization data.
+- la_prosecutor: A series of tests for leakage, demonstrated on the Los Angeles Chronic Offenders project.
