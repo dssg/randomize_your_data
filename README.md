@@ -144,3 +144,9 @@ You could use standard statistical testing, where you require a level of evidenc
 - la\_prosecutor: A series of tests for leakage, demonstrated on the Los Angeles Chronic Offenders project.
 
 We recommend starting with the `Demonstrate Leakage Detection.ipynb` notebook in the `randomization_strategy` directory. It uses fake data so you can easily understand how it's working. You might them look at `dirty_duck`, which uses open data and our Triage software. `la_prosecutor` is from another DSaPP project that uses private data.
+
+## Future
+It would be good to complete testing on several problems:
+- Test on known leakage problems. I believe Kaggle has good examples.
+- Complete testing on several triage projects. Triage does a good job of handling temporal issues, so the only leakage might come from errors in the source data or errors in the ETL.
+- Test on other real-world problems.
