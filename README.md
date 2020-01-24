@@ -57,8 +57,8 @@ Most human-related problems have spatial and temporal components, so that a mode
 
 The figure below shows a simple example. The first plot shows data collected from 2012 through 2017. There is a clear shock in 2015. If it were 2014, we might be growing confident in our ability to predict, only to be surprised a year later. Standard cross validation (second plot) would randomly assign these observations to k folds, eliminating the temporal surprise and giving us a false sense of data stability.  
 
-[temporal data](images/image2.png)
-[random CV](images.image1.png)
+![alt text](images/image2.png "Temporal Data")
+![alt text](images/image1.png "Standard Cross Validation")
 
 If we want to predict US annual GDP and we have observations from 2015-2017, the three standard sets would be:  
   
@@ -142,3 +142,5 @@ You could use standard statistical testing, where you require a level of evidenc
 - randomization\_strategy: Exploration of the randomization strategy for leakage detection using dummy data and models.
 - dirty\_duck: Application of randomization strategy toward the [Dirty Duck Tutorial](https://github.com/dssg/dirtyduck), using City of Chicago restaurant-inspection data.
 - la\_prosecutor: A series of tests for leakage, demonstrated on the Los Angeles Chronic Offenders project.
+
+We recommend starting with the `Demonstrate Leakage Detection.ipynb` notebook in the `randomization_strategy` directory. It uses fake data so you can easily understand how it's working. You might them look at `dirty_duck`, which uses open data and our Triage software. `la_prosecutor` is from another DSaPP project that uses private data.
