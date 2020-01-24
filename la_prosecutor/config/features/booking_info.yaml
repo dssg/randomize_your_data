@@ -1,0 +1,64 @@
+- # features from bookings
+  prefix: 'booking_info'
+  from_obj: |
+    (
+      SELECT eb.entity_id, b.*, 
+             CASE WHEN cb2.case_date IS NOT NULL 
+                  THEN GREATEST(cb2.case_date, b.arr_datetime::DATE)
+                  ELSE b.arr_datetime::DATE
+             END AS bkg_date 
+      FROM staging.booking_addl_info b 
+      JOIN staging.entity_booking eb USING(booking_no)
+      LEFT JOIN (
+        SELECT ci.entity_id, ci.casenumber, 
+               ci.case_date, cb.bkgnumber::INT AS booking_no
+        FROM staging.feature_case_info ci
+        JOIN staging.case_booking cb USING(casenumber)
+      ) cb2 USING(entity_id, booking_no)
+    ) AS bi
+  knowledge_date_column: 'bkg_date'
+  aggregates:
+    - # attempt flag
+      quantity: 'attempt_flag'
+      metrics: ['max', 'sum']
+    - # unknown charge flag (i.e., can't join to UCC table)
+      quantity: 'unknown_charge'
+      metrics: ['max', 'sum']
+    - # types of booking charges - always infractions
+      quantity: 'always_infraction'
+      metrics: ['max', 'sum', 'avg']
+    - # types of booking charges - always misdemeanor
+      quantity: 'always_misdemeanor'
+      metrics: ['max', 'sum', 'avg']
+    - # types of booking charges - always felony
+      quantity: 'always_felony'
+      metrics: ['max', 'sum', 'avg']
+    - # types of booking charges - mult. offense types
+      quantity: 'mult_offense_types'
+      metrics: ['max', 'sum', 'avg']
+    - # drug-related offenses
+      quantity: 'ever_drug_related'
+      metrics: ['max', 'sum', 'avg']
+    - # victim-related offenses
+      quantity: 'ever_victim_related'
+      metrics: ['max', 'sum', 'avg']
+    - # charges that ever count as a strike
+      quantity: 'ever_strike'
+      metrics: ['max', 'sum', 'avg']
+    - # charges that always count as a strike
+      quantity: 'always_strike'
+      metrics: ['max', 'sum', 'avg']
+    - # charges that are ever marked violent
+      quantity: 'ever_violent'
+      metrics: ['max', 'sum', 'avg']
+    - # charges that are always marked violent
+      quantity: 'always_violent'
+      metrics: ['max', 'sum', 'avg']
+    - # charges that are ever marked serious
+      quantity: 'ever_serious'
+      metrics: ['max', 'sum', 'avg']
+    - # charges that are always marked serious
+      quantity: 'always_serious'
+      metrics: ['max', 'sum', 'avg']
+  intervals: ['1y', '2y', '5y', '10y', '50y']
+  groups: ['entity_id']
