@@ -18,11 +18,9 @@ If we were to independently and randomly sort each column in the raw data, that 
 * You should not be able to predict an entity's score (relative or absolute) across samples. Another way to put this is that entities ranked high in one sample are no more likely to be highly ranked in another.
 * You should not be able to predict feature importances (absolute or relative) across samples.
 
-These are null hypotheses, and deviations from them suggest the existence of leakage. Predictable scores and features may also help identify the source of the leak.
+These are null hypotheses, and deviations from them suggest the existence of leakage. It's similar to standard [permutation tests](https://cran.r-project.org/web/packages/lmPerm/vignettes/lmPerm.pdf), except we're not just resorting the labels but creating new labels -and- features. It would be simpler to only randomize the columns that define the label, but label generation can draw on many pieces of information in the raw data in complex ways. Randomizing all the columns in the raw data helps ensure that the data-generating process is completely broken, leading to valid statistical tests for leakage.
 
-It would be simpler to only randomize the columns that define the label. But label generation can draw on many pieces of information in the raw data in complex ways. Randomizing all the columns in the raw data helps ensure that the data-generating process is completely broken, leading to valid statistical tests.
-
-It is best to randomize as early as possible in the pipeline. Leakage can happen at any step, so early randomization gives you a better chance of detection.
+Randomizing all columns should render all features useless as predictors. If a leak exists, predictable scores and features may help identify the source of the leak. 
 
 ### Test label flipping
 If there is leakage from the test set to the train set, your model will anticipate changes in the test set that it should not know about. One way to test for that is to create an exogenous shock in the test set, re-train your models, and observe what happens. Perhaps the simplest way is to flip the test labels, so 1s become 0s and 0s become 1s. Hopefully you'll observe the following:
